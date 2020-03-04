@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Dev Quiz: Front End</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+        <script>
+            var template = Handlebars.compile("Handlebars <b>{{doesWhat}}</b>");
+        </script>
+        <script>
+            function loadTable() {
+                $(function () {
+                    var templateText = $("#tableTemplate").html();
+                    var tableTemplate = Handlebars.compile(templateText);
+                    let xhr = new XMLHttpRequest;
+                    xhr.open('GET', 'https://aimtell.com/files/sites.json', true);
+                    xhr.onload = function () {
+                        if (this.status === 200)
+                        {
+                            var json = JSON.parse(this.responseText);
+                            res = json.sites;//get sites info in json
+                            console.log(res);
+                            $("#res").html(tableTemplate({
+                                array: res
+                            }));
+                        }
+                    };
+                    xhr.send();
+                });
+            };
+            Handlebars.registerHelper('if_eq', function (a, b, opts) {
+                if (a === b) {
+                    return opts.fn(this);
+                } else {
+                    return opts.inverse(this);
+                }
+            });
+        </script>
+    </head>
+<body>
+    <div class="container">
+        <div class="row">
+            <h2 class="col-md-2">Basic Table</h2>
+            <button type="button" onclick="loadTable()" class="col-sm-2">Load Table</button>
+        </div>
+        <div id="res" class="row"></div>
+    </div>
+    <script type="text/x-handlebars-template" id="tableTemplate">
+        <table class="table">
+            <thead>
+                <tr>
+                {{#each array.[0]}}
+                <th class="col-sm-1">{{@key}}</th>
+                {{/each}}
+                </tr>
+            </thead>
+            <tbody>
+                {{#each array}}
+                    <tr>
+                        {{#each this}}      
+                            {{#if_eq @key 'icon'}}
+                                <td class="col-sm-1"><img src = '{{{this}}}' alt = '{{{this}}}' style="width:50px;height:50px;"></img></td>
+                            {{else}}
+                                <td class="col-sm-1">{{this}}</td>
+                            {{/if_eq}}
+                        {{/each}}
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
+</body>
